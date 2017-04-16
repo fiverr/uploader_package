@@ -1,8 +1,8 @@
-src
 node_modules
+src
 circle.yml
-.babelrc
 mocha.opts
-yarn.lock
 test_setup.js
 *.log
+yarn.lock
+.babelrc
