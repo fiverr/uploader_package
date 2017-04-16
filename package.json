@@ -1,0 +1,16 @@
+{
+  "name": "@fiverr/uploader",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fiverr/uploader_package.git"
+  },
+  "author": "Evyatar Alush",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fiverr/uploader_package/issues"
+  },
+  "homepage": "https://github.com/fiverr/uploader_package#readme"
+}
