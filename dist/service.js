@@ -20,25 +20,30 @@ var UploaderService = function () {
 
     _createClass(UploaderService, [{
         key: 'upload',
-        value: function upload(options) {
+        value: function upload(_ref) {
             var _this = this;
 
+            var _ref$formData = _ref.formData,
+                formData = _ref$formData === undefined ? new FormData() : _ref$formData,
+                field = _ref.field,
+                additionalFields = _ref.additionalFields,
+                customHeaders = _ref.customHeaders;
+
             return new Promise(function (resolve, reject) {
-                var formData = options.formData || new FormData();
 
-                formData.append(options.field, _this.file);
+                formData.append(field, _this.file);
 
-                if (options.additionalFields) {
-                    for (var field in options.additionalFields) {
-                        formData.append(field, options.additionalFields[field]);
+                if (additionalFields) {
+                    for (var fieldName in additionalFields) {
+                        formData.append(fieldName, additionalFields[fieldName]);
                     }
                 }
 
                 _this.xhr.open('POST', _this.url);
 
-                if (options.customHeaders) {
-                    for (var header in options.customHeaders) {
-                        _this.xhr.setRequestHeader(header, options.customHeaders);
+                if (customHeaders) {
+                    for (var header in customHeaders) {
+                        _this.xhr.setRequestHeader(header, customHeaders);
                     }
                 }
 

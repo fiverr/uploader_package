@@ -17,32 +17,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var KILOBYTE = 1000,
     MEGABYTE = 1024;
 
-var UploadController = function () {
-    function UploadController(_ref) {
+var Uploader = function () {
+    function Uploader(_ref) {
         var url = _ref.url,
-            attachments = _ref.attachments,
-            maxFiles = _ref.maxFiles,
-            headers = _ref.headers,
-            optionsObject = _ref.optionsObject,
+            _ref$attachments = _ref.attachments,
+            attachments = _ref$attachments === undefined ? {} : _ref$attachments,
+            _ref$maxFiles = _ref.maxFiles,
+            maxFiles = _ref$maxFiles === undefined ? 10 : _ref$maxFiles,
+            _ref$headers = _ref.headers,
+            headers = _ref$headers === undefined ? {} : _ref$headers,
+            _ref$optionsObject = _ref.optionsObject,
+            optionsObject = _ref$optionsObject === undefined ? {} : _ref$optionsObject,
             updateCb = _ref.updateCb,
-            onLoad = _ref.onLoad;
+            onLoad = _ref.onLoad,
+            _ref$maxFilesText = _ref.maxFilesText,
+            maxFilesText = _ref$maxFilesText === undefined ? '' : _ref$maxFilesText;
 
-        _classCallCheck(this, UploadController);
+        _classCallCheck(this, Uploader);
 
-        this.attachments = attachments || {};
-        this.maxFiles = maxFiles || 10;
-        this.url = url;
-        this.optionsObject = optionsObject || {};
-        this.headers = headers || {};
-        this.fileCounter = Object.keys(this.attachments).length || 1;
-        this.updateCb = updateCb;
-        this.onLoad = onLoad;
+        Object.assign(this, {
+            attachments: attachments,
+            maxFiles: maxFiles,
+            url: url,
+            optionsObject: optionsObject,
+            headers: headers,
+            fileCounter: Object.keys(attachments).length,
+            updateCb: updateCb,
+            onLoad: onLoad,
+            maxFilesText: maxFilesText
+        });
 
         this.onAttach = this.onAttach.bind(this);
         this.onAbort = this.onAbort.bind(this);
     }
 
-    _createClass(UploadController, [{
+    _createClass(Uploader, [{
         key: 'update',
         value: function update() {
             if (!this.updateCb) {
@@ -109,7 +118,7 @@ var UploadController = function () {
         value: function prepareFilesForUpload(fileList) {
             var fileIds = [],
                 fileCount = Object.keys(this.attachments).length,
-                maxFilesReached = UploadController.maxFilesReached(fileCount, this.maxFiles);
+                maxFilesReached = Uploader.maxFilesReached(fileCount, this.maxFiles);
 
             var openSlots = !maxFilesReached && this.maxFiles - fileCount;
 
@@ -117,10 +126,10 @@ var UploadController = function () {
 
                 var file = fileList[i],
                     currentFile = this.newFile(file),
-                    fileMeta = UploadController.getFileReady(currentFile.file),
+                    fileMeta = Uploader.getFileReady(currentFile.file),
                     addEmpty = openSlots <= 0;
 
-                var fileId = UploadController.itemId(fileMeta.name);
+                var fileId = Uploader.itemId(fileMeta.name);
 
                 if (this.attachments[fileId]) {
                     fileId = '' + fileId + this.fileCounter;
@@ -134,7 +143,7 @@ var UploadController = function () {
                     openSlots--;
                     fileIds.push(fileId);
                 } else {
-                    fileMeta.error = 'over-max';
+                    fileMeta.error = this.maxFilesText;
                 }
 
                 this.attachments[fileId] = currentFile;
@@ -176,15 +185,13 @@ var UploadController = function () {
         key: 'prettyFileSize',
         value: function prettyFileSize(size) {
             var sizeInKB = Math.round(size / KILOBYTE);
-            var unit = 'KB';
 
             if (sizeInKB < MEGABYTE) {
-                return sizeInKB + unit;
+                return sizeInKB + 'KB';
             } else {
-                unit = 'MB';
                 var sizeInMB = (sizeInKB / MEGABYTE).toFixed(2);
 
-                return sizeInMB + unit;
+                return sizeInMB + 'MB';
             }
         }
     }, {
@@ -192,20 +199,21 @@ var UploadController = function () {
         value: function getFileReady(file) {
 
             var fileMeta = file,
-                fullName = UploadController.stripNameFromExtension(fileMeta.name),
-                fileSize = UploadController.prettyFileSize(fileMeta.size);
+                fullName = Uploader.stripNameFromExtension(fileMeta.name),
+                fileSize = Uploader.prettyFileSize(fileMeta.size);
 
             fileMeta.fileName = fullName.name;
             fileMeta.extension = fullName.extension;
             fileMeta.fileSize = fileSize;
             fileMeta.progress = 0;
+            fileMeta.loaded = false;
 
             return fileMeta;
         }
     }]);
 
-    return UploadController;
+    return Uploader;
 }();
 
-exports.default = UploadController;
+exports.default = Uploader;
 module.exports = exports['default'];
