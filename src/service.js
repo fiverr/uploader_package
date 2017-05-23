@@ -27,7 +27,7 @@ class UploaderService {
 
             if (this.headers) {
                 for (const header in this.headers) {
-                    this.xhr.setRequestHeader(header, this.headers.header);
+                    this.xhr.setRequestHeader(header, this.headers[header]);
                 }
             }
 
