@@ -98,9 +98,17 @@ var Uploader = function () {
                     _this.update();
                 });
 
-                _this.attachments[id].upload(_this.optionsObject).then(function (uploadData) {
+                _this.attachments[id].upload(_this.optionsObject).then(function (response) {
                     var result = {};
-                    result[id] = JSON.parse(uploadData);
+
+                    result[id] = {};
+
+                    try {
+                        result[id] = JSON.parse(response);
+                    } catch (e) {
+                        result[id].raw = response;
+                    }
+
                     _this.updateFileObject(id, 'loaded', true);
                     _this.onLoad && _this.onLoad(result);
                 });

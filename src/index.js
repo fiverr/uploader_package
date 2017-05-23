@@ -118,9 +118,17 @@ class Uploader {
             });
 
             this.attachments[id].upload(this.optionsObject)
-                .then((uploadData) => {
+                .then((response) => {
                     const result = {};
-                    result[id] = JSON.parse(uploadData);
+
+                    result[id] = {};
+
+                    try {
+                        result[id] = JSON.parse(response);
+                    } catch (e) {
+                        result[id].raw = response;
+                    }
+
                     this.updateFileObject(id, 'loaded', true);
                     this.onLoad && this.onLoad(result);
                 });
