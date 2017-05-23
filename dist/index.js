@@ -20,8 +20,8 @@ var KILOBYTE = 1000,
 var Uploader = function () {
     function Uploader(_ref) {
         var url = _ref.url,
-            _ref$attachments = _ref.attachments,
-            attachments = _ref$attachments === undefined ? {} : _ref$attachments,
+            _ref$uploads = _ref.uploads,
+            uploads = _ref$uploads === undefined ? {} : _ref$uploads,
             _ref$maxFiles = _ref.maxFiles,
             maxFiles = _ref$maxFiles === undefined ? 10 : _ref$maxFiles,
             _ref$headers = _ref.headers,
@@ -36,12 +36,12 @@ var Uploader = function () {
         _classCallCheck(this, Uploader);
 
         Object.assign(this, {
-            attachments: attachments,
+            uploads: uploads,
             maxFiles: maxFiles,
             url: url,
             optionsObject: optionsObject,
             headers: headers,
-            fileCounter: Object.keys(attachments).length,
+            fileCounter: Object.keys(uploads).length,
             updateCb: updateCb,
             onLoad: onLoad,
             maxFilesText: maxFilesText
@@ -60,9 +60,9 @@ var Uploader = function () {
 
             var files = {};
 
-            for (var attachment in this.attachments) {
-                if (this.attachments[attachment].hasOwnProperty('file')) {
-                    files[attachment] = this.attachments[attachment].file;
+            for (var upload in this.uploads) {
+                if (this.uploads[upload].hasOwnProperty('file')) {
+                    files[upload] = this.uploads[upload].file;
                 }
             }
 
@@ -83,8 +83,8 @@ var Uploader = function () {
     }, {
         key: 'onAbort',
         value: function onAbort(id) {
-            this.attachments[id].cancel();
-            delete this.attachments[id];
+            this.uploads[id].cancel();
+            delete this.uploads[id];
             this.update();
         }
     }, {
@@ -93,12 +93,12 @@ var Uploader = function () {
             var _this = this;
 
             ids.forEach(function (id) {
-                _this.attachments[id].onProgress(function (progress) {
+                _this.uploads[id].onProgress(function (progress) {
                     _this.updateFileObject(id, 'progress', progress);
                     _this.update();
                 });
 
-                _this.attachments[id].upload(_this.optionsObject).then(function (response) {
+                _this.uploads[id].upload(_this.optionsObject).then(function (response) {
                     var result = {};
 
                     result[id] = {};
@@ -117,15 +117,15 @@ var Uploader = function () {
     }, {
         key: 'updateFileObject',
         value: function updateFileObject(id, field, value) {
-            if (this.attachments[id] && this.attachments[id].hasOwnProperty('file')) {
-                this.attachments[id].file[field] = value;
+            if (this.uploads[id] && this.uploads[id].hasOwnProperty('file')) {
+                this.uploads[id].file[field] = value;
             }
         }
     }, {
         key: 'prepareFilesForUpload',
         value: function prepareFilesForUpload(fileList) {
             var fileIds = [],
-                fileCount = Object.keys(this.attachments).length,
+                fileCount = Object.keys(this.uploads).length,
                 maxFilesReached = Uploader.maxFilesReached(fileCount, this.maxFiles);
 
             var openSlots = !maxFilesReached && this.maxFiles - fileCount;
@@ -139,7 +139,7 @@ var Uploader = function () {
 
                 var fileId = Uploader.itemId(fileMeta.name);
 
-                if (this.attachments[fileId]) {
+                if (this.uploads[fileId]) {
                     fileId = '' + fileId + this.fileCounter;
                 }
 
@@ -154,7 +154,7 @@ var Uploader = function () {
                     fileMeta.error = this.maxFilesText;
                 }
 
-                this.attachments[fileId] = currentFile;
+                this.uploads[fileId] = currentFile;
             }
 
             return fileIds;
