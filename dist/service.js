@@ -49,7 +49,7 @@ var UploaderService = function () {
 
                 if (_this.headers) {
                     for (var _header in _this.headers) {
-                        _this.xhr.setRequestHeader(_header, _this.headers.header);
+                        _this.xhr.setRequestHeader(_header, _this.headers[_header]);
                     }
                 }
 
