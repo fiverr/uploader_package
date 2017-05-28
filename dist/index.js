@@ -101,7 +101,9 @@ var Uploader = function () {
                 _this.uploads[id].upload(_this.optionsObject).then(function (response) {
                     var result = {};
 
-                    result[id] = {};
+                    result[id] = {
+                        id: id
+                    };
 
                     try {
                         result[id] = JSON.parse(response);

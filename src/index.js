@@ -121,7 +121,9 @@ class Uploader {
                 .then((response) => {
                     const result = {};
 
-                    result[id] = {};
+                    result[id] = {
+                        id
+                    };
 
                     try {
                         result[id] = JSON.parse(response);
