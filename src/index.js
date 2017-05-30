@@ -5,15 +5,15 @@ const KILOBYTE = 1000,
 
 class Uploader {
 
-    constructor({url, attachments = {}, maxFiles = 10, headers = {}, optionsObject = {}, updateCb, onLoad, maxFilesText = ''}) {
+    constructor({url, uploads = {}, maxFiles = 10, headers = {}, optionsObject = {}, updateCb, onLoad, maxFilesText = ''}) {
 
         Object.assign(this, {
-            attachments,
+            uploads,
             maxFiles,
             url,
             optionsObject,
             headers,
-            fileCounter: Object.keys(attachments).length,
+            fileCounter: Object.keys(uploads).length,
             updateCb,
             onLoad,
             maxFilesText
@@ -84,9 +84,9 @@ class Uploader {
 
         const files = {};
 
-        for (const attachment in this.attachments) {
-            if (this.attachments[attachment].hasOwnProperty('file')) {
-                files[attachment] = this.attachments[attachment].file;
+        for (const upload in this.uploads) {
+            if (this.uploads[upload].hasOwnProperty('file')) {
+                files[upload] = this.uploads[upload].file;
             }
         }
 
@@ -104,23 +104,33 @@ class Uploader {
     }
 
     onAbort(id) {
-        this.attachments[id].cancel();
-        delete this.attachments[id];
+        this.uploads[id].cancel();
+        delete this.uploads[id];
         this.update();
     }
 
     registerProgress(ids) {
 
         ids.forEach((id) => {
-            this.attachments[id].onProgress((progress) => {
+            this.uploads[id].onProgress((progress) => {
                 this.updateFileObject(id, 'progress', progress);
                 this.update();
             });
 
-            this.attachments[id].upload(this.optionsObject)
-                .then((uploadData) => {
+            this.uploads[id].upload(this.optionsObject)
+                .then((response) => {
                     const result = {};
-                    result[id] = JSON.parse(uploadData);
+
+                    result[id] = {
+                        id
+                    };
+
+                    try {
+                        result[id] = JSON.parse(response);
+                    } catch (e) {
+                        result[id].raw = response;
+                    }
+
                     this.updateFileObject(id, 'loaded', true);
                     this.onLoad && this.onLoad(result);
                 });
@@ -128,14 +138,14 @@ class Uploader {
     }
 
     updateFileObject(id, field, value) {
-        if (this.attachments[id] && this.attachments[id].hasOwnProperty('file')) {
-            this.attachments[id].file[field] = value;
+        if (this.uploads[id] && this.uploads[id].hasOwnProperty('file')) {
+            this.uploads[id].file[field] = value;
         }
     }
 
     prepareFilesForUpload(fileList) {
         const fileIds = [],
-            fileCount = Object.keys(this.attachments).length,
+            fileCount = Object.keys(this.uploads).length,
             maxFilesReached = Uploader.maxFilesReached(fileCount, this.maxFiles);
 
         let openSlots = !maxFilesReached && this.maxFiles - fileCount;
@@ -149,7 +159,7 @@ class Uploader {
 
             let fileId = Uploader.itemId(fileMeta.name);
 
-            if (this.attachments[fileId]) {
+            if (this.uploads[fileId]) {
                 fileId = `${fileId}${this.fileCounter}`;
             }
 
@@ -164,7 +174,7 @@ class Uploader {
                 fileMeta.error = this.maxFilesText;
             }
 
-            this.attachments[fileId] = currentFile;
+            this.uploads[fileId] = currentFile;
         }
 
         return fileIds;
