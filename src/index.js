@@ -126,7 +126,9 @@ class Uploader {
                     };
 
                     try {
-                        result[id] = JSON.parse(response);
+                        const serverResponse = JSON.parse(response);
+                        this.updateFileObject(id, 'onLoadResponse', serverResponse);
+                        result[id] = serverResponse;
                     } catch (e) {
                         result[id].raw = response;
                     }

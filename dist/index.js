@@ -106,7 +106,9 @@ var Uploader = function () {
                     };
 
                     try {
-                        result[id] = JSON.parse(response);
+                        var serverResponse = JSON.parse(response);
+                        _this.updateFileObject(id, 'response', serverResponse);
+                        result[id] = serverResponse;
                     } catch (e) {
                         result[id].raw = response;
                     }
