@@ -7,8 +7,8 @@
     "build": "babel src -d dist",
     "build:watch": "babel src -d dist --watch",
     "prepublish": "npm run build",
-    "test": "./node_modules/mocha/bin/mocha lib/**/**_spec.js  --opts mocha.opts",
-    "test:watch": "./node_modules/mocha/bin/mocha lib/**/**_spec.js  --opts mocha.opts --watch"
+    "test": "./node_modules/mocha/bin/mocha src/**/**_spec.js  --opts mocha.opts",
+    "test:watch": "./node_modules/mocha/bin/mocha src/**/**_spec.js  --opts mocha.opts --watch"
   },
   "repository": {
     "type": "git",

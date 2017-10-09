@@ -22,7 +22,7 @@ class Uploader {
         this.onAttach = this.onAttach.bind(this);
         this.onAbort = this.onAbort.bind(this);
     }
-
+    //Tested
     static itemId(name) {
         return `file_${name.match(/[a-zA-Z0-9_]/gi).join('')}`;
     }
@@ -30,19 +30,19 @@ class Uploader {
     static maxFilesReached(fileCount, maxFiles) {
         return fileCount >= maxFiles;
     }
-
+    //Tested
     static stripNameFromExtension(name) {
 
         const lastDot = name.lastIndexOf('.'),
             nameLength = name.length,
-            hasExtension = (nameLength - lastDot) <= 5;
+            hasExtension = lastDot > 0 && (nameLength - lastDot) <= 5;
 
         let extension = '';
 
         if (hasExtension) {
             extension = name.slice(lastDot);
             name = name.split(extension)[0];
-        }
+        } 
 
         return {
             name,
@@ -50,7 +50,10 @@ class Uploader {
         };
     }
 
+    //Teted
     static prettyFileSize(size) {
+        if(!size) { return '0KB'; }
+
         const sizeInKB = Math.round(size / KILOBYTE);
 
         if (sizeInKB < MEGABYTE) {

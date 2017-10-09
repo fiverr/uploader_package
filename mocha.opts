@@ -2,3 +2,4 @@
 --full-trace
 --inline-diffs
 --timeout 200
+--compilers js:babel-core/register
