@@ -16,6 +16,9 @@ const uploader = new UploadController({
     maxFilesText: 'Max. Files Reached' // text for marking max-files-exceeded
 });
 
+
+uploader.onAttach(files: FileList) // Add new files to the uploader.
+uploader.onDetach(fileId: string) // Remove a file from the state.
 ```
 
 And then, to get all attachments:
