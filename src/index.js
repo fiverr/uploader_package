@@ -35,7 +35,7 @@ class Uploader {
 
         const lastDot = name.lastIndexOf('.'),
             nameLength = name.length,
-            hasExtension = (nameLength - lastDot) <= 5;
+            hasExtension = lastDot > 0 && (nameLength - lastDot) <= 5;
 
         let extension = '';
 
@@ -51,6 +51,8 @@ class Uploader {
     }
 
     static prettyFileSize(size) {
+        if(!size) { return '0KB'; }
+
         const sizeInKB = Math.round(size / KILOBYTE);
 
         if (sizeInKB < MEGABYTE) {
