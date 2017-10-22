@@ -68,6 +68,20 @@ describe('Uploader', () => {
             
         })
 
+
+    describe('getFiles', () => {
+        it('Should have initial value of `0`', () => {
+            const obj = uploader.getFiles();
+            expect(Object.keys(obj).length).to.equals(0)
+        });
+        
+        it('Should return the same keys and the uploads, (in case the file property exists)', () => {
+            uploader.onAttach(fileList);
+            const obj = uploader.getFiles();       
+            expect(Object.keys(obj).length).to.equals(1)
+        });
+    });
+
         describe('Upload/Remove a file', () => {
             it('Should append the file to the uploads property', () => {
                 uploader.onAttach(fileList);
@@ -133,4 +147,3 @@ describe('Uploader', () => {
         });
     })
 })
-

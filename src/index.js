@@ -84,15 +84,17 @@ class Uploader {
             return;
         }
 
-        const files = {};
+        this.updateCb(this.getFiles());
+    }
 
+    getFiles() {
+        const files = {};
         for (const upload in this.uploads) {
             if (this.uploads[upload].hasOwnProperty('file')) {
                 files[upload] = this.uploads[upload].file;
             }
         }
-
-        this.updateCb(files);
+        return files;
     }
 
     newFile(file) {
@@ -128,15 +130,15 @@ class Uploader {
                     };
 
                     try {
-                        const serverResponse = JSON.parse(response);
-                        this.updateFileObject(id, 'onLoadResponse', serverResponse);
-                        result[id] = serverResponse;
+                        result[id] = JSON.parse(response);
                     } catch (e) {
                         result[id].raw = response;
                     }
 
                     this.updateFileObject(id, 'loaded', true);
-                    this.onLoad && this.onLoad(result);
+                    this.updateFileObject(id, 'onLoadResponse', result[id]);
+            
+                    this.onLoad && this.onLoad(result, this.getFiles());
                 });
         });
     }
