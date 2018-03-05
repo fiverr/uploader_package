@@ -9,13 +9,14 @@ class UploaderService {
     upload({formData = new FormData(), field, additionalFields, customHeaders}) {
         return new Promise((resolve, reject) => {
 
-            formData.append(field, this.file);
-
             if (additionalFields) {
                 for (const fieldName in additionalFields) {
                     formData.append(fieldName, additionalFields[fieldName]);
                 }
             }
+
+            formData.append('content-type', this.file.type);
+            formData.append(field, this.file);
 
             this.xhr.open('POST', this.url);
 
