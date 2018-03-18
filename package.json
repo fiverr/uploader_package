@@ -1,6 +1,6 @@
 {
   "name": "@fiverr/uploader",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Client side uploader package",
   "main": "./dist/index.js",
   "scripts": {
@@ -29,7 +29,8 @@
     "form-data": "^2.3.1",
     "mocha": "^3.2.0",
     "request-promise": "^4.2.2",
-    "sinon": "^4.0.1"
+    "sinon": "^4.0.1",
+    "blob": "^0.0.4"
   },
   "homepage": "https://github.com/fiverr/uploader_package#readme",
   "dependencies": {}

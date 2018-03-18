@@ -1,7 +1,8 @@
 class UploaderService {
     constructor(url, file, headers) {
         this.url = url;
-        this.file = file;
+        this.file = new Blob([file], { type: file.type });
+        this.file.name = file.name
         this.xhr = new XMLHttpRequest();
         this.headers = headers;
     }
@@ -16,7 +17,7 @@ class UploaderService {
             }
 
             formData.append('content-type', this.file.type);
-            formData.append(field, this.file);
+            formData.append(field, this.file, this.file.name);
 
             this.xhr.open('POST', this.url);
 
