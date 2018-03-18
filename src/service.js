@@ -2,6 +2,7 @@ class UploaderService {
     constructor(url, file, headers) {
         this.url = url;
         this.file = file;
+        this.meta = {};
         this.xhr = new XMLHttpRequest();
         this.headers = headers;
     }
