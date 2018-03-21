@@ -138,7 +138,7 @@ class Uploader {
                         result[id].raw = response;
                     }
 
-                    this.updateFileObject(id, 'loaded', true);
+                    this.updateFileMeta(id, 'loaded', true);
                     this.updateFileMeta(id, 'onLoadResponse', result[id]);
             
                     this.onLoad && this.onLoad(result, this.getFiles());
