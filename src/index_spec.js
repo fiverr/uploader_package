@@ -1,6 +1,6 @@
 const sinon = require('sinon');
 const Uploader = require('./index.js');
-const FileAPI = require('file-api')
+const FileAPI = require('file-api');
 const {expect} = require('chai');
 const {describe} = require('mocha');
 
@@ -119,7 +119,7 @@ describe('Uploader', () => {
                     uploader = new Uploader({url: 'www.fiverr.com', maxFilesText: 'MAX', uploads: {}, maxFiles: 2,  headers: {}, optionsObject: {}, updateCb: () => {}}); 
                     fileList = new FileAPI.FileList([file, file, file, file, file]);
                     uploader.onAttach(fileList);
-                    expect(uploader.uploads['file_abcsongtxt4'].file.hasOwnProperty('error')).to.equal(true);                
+                    expect(uploader.uploads['file_abcsongtxt4'].meta.hasOwnProperty('error')).to.equal(true);                
                 });
     
                 it('Should return false when the number of files is greater than the max value', () => {

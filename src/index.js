@@ -5,7 +5,7 @@ const KILOBYTE = 1000,
 
 class Uploader {
 
-    constructor({url, uploads = {}, maxFiles = 10, headers = {}, optionsObject = {}, updateCb, onLoad, maxFilesText = ''}) {
+    constructor({url, uploads = {}, maxFiles = 10, headers = {}, optionsObject = {}, updateCb, onLoad, onError, maxFilesText = ''}) {
 
         Object.assign(this, {
             uploads,
@@ -16,11 +16,13 @@ class Uploader {
             fileCounter: Object.keys(uploads).length,
             updateCb,
             onLoad,
+            onError,
             maxFilesText
         });
 
         this.onAttach = this.onAttach.bind(this);
         this.onAbort = this.onAbort.bind(this);
+        this.getFiles = this.getFiles.bind(this)
     }
 
     static itemId(name) {
@@ -66,7 +68,7 @@ class Uploader {
 
     static getFileReady(file) {
 
-        const fileMeta = file,
+        const fileMeta = { name: file.name, size: file.size },
             fullName = Uploader.stripNameFromExtension(fileMeta.name),
             fileSize = Uploader.prettyFileSize(fileMeta.size);
 
@@ -75,6 +77,7 @@ class Uploader {
         fileMeta.fileSize = fileSize;
         fileMeta.progress = 0;
         fileMeta.loaded = false;
+        fileMeta.uploadStartTime = Date.now();
 
         return fileMeta;
     }
@@ -91,7 +94,7 @@ class Uploader {
         const files = {};
         for (const upload in this.uploads) {
             if (this.uploads[upload].hasOwnProperty('file')) {
-                files[upload] = this.uploads[upload].file;
+                files[upload] = this.uploads[upload].meta;
             }
         }
         return files;
@@ -117,7 +120,7 @@ class Uploader {
 
         ids.forEach((id) => {
             this.uploads[id].onProgress((progress) => {
-                this.updateFileObject(id, 'progress', progress);
+                this.updateFileMeta(id, 'progress', progress);
                 this.update();
             });
 
@@ -135,17 +138,20 @@ class Uploader {
                         result[id].raw = response;
                     }
 
-                    this.updateFileObject(id, 'loaded', true);
-                    this.updateFileObject(id, 'onLoadResponse', result[id]);
+                    this.updateFileMeta(id, 'loaded', true);
+                    this.updateFileMeta(id, 'onLoadResponse', result[id]);
             
                     this.onLoad && this.onLoad(result, this.getFiles());
+                })
+                .catch((error) => {
+                    this.onError && this.onError({attachmentName: id, error});
                 });
         });
     }
 
-    updateFileObject(id, field, value) {
-        if (this.uploads[id] && this.uploads[id].hasOwnProperty('file')) {
-            this.uploads[id].file[field] = value;
+    updateFileMeta(id, field, value) {
+        if (this.uploads[id] && this.uploads[id].hasOwnProperty('meta')) {
+            this.uploads[id].meta[field] = value;
         }
     }
 
@@ -181,6 +187,7 @@ class Uploader {
             }
 
             this.uploads[fileId] = currentFile;
+            this.uploads[fileId].meta = fileMeta;
         }
 
         return fileIds;
