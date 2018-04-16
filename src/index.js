@@ -5,11 +5,12 @@ const KILOBYTE = 1000,
 
 class Uploader {
 
-    constructor({url, uploads = {}, maxFiles = 10, headers = {}, optionsObject = {}, updateCb, onLoad, onError, maxFilesText = ''}) {
+    constructor({url, uploads = {}, maxFiles = 10, maxFileSize = 0, headers = {}, optionsObject = {}, updateCb, onLoad, onError, maxFilesText = '', maxFileSizeText = ''}) {
 
         Object.assign(this, {
             uploads,
             maxFiles,
+            maxFileSize,
             url,
             optionsObject,
             headers,
@@ -17,7 +18,8 @@ class Uploader {
             updateCb,
             onLoad,
             onError,
-            maxFilesText
+            maxFilesText,
+            maxFileSizeText
         });
 
         this.onAttach = this.onAttach.bind(this);
@@ -31,6 +33,11 @@ class Uploader {
 
     static maxFilesReached(fileCount, maxFiles) {
         return fileCount >= maxFiles;
+    }
+
+    static bytesToMegabytes(bytes) {
+        if (!bytes) { return 0;}
+        return bytes / 1000000;
     }
 
     static stripNameFromExtension(name) {
@@ -53,7 +60,7 @@ class Uploader {
     }
 
     static prettyFileSize(size) {
-        if(!size) { return '0KB'; }
+        if (!size) { return '0KB'; }
 
         const sizeInKB = Math.round(size / KILOBYTE);
 
@@ -140,7 +147,7 @@ class Uploader {
 
                     this.updateFileMeta(id, 'loaded', true);
                     this.updateFileMeta(id, 'onLoadResponse', result[id]);
-            
+
                     this.onLoad && this.onLoad(result, this.getFiles());
                 })
                 .catch((error) => {
@@ -155,19 +162,29 @@ class Uploader {
         }
     }
 
-    prepareFilesForUpload(fileList) {
-        const fileIds = [],
-            fileCount = Object.keys(this.uploads).length,
-            maxFilesReached = Uploader.maxFilesReached(fileCount, this.maxFiles);
+    getOpenSlots() {
+        const fileCount = Object.keys(this.uploads).length;
+        const maxFilesReached = Uploader.maxFilesReached(fileCount, this.maxFiles);
 
-        let openSlots = !maxFilesReached && this.maxFiles - fileCount;
+        if (maxFilesReached) { return 0 };
+
+        return this.maxFiles - fileCount;
+    }
+
+    maxSizeExceeded(size) {
+        if (!this.maxFileSize) { return false; }
+        return this.maxFileSize < Uploader.bytesToMegabytes(size)
+    }
+
+    prepareFilesForUpload(fileList) {
+        const fileIds = [];
+        let openSlots = this.getOpenSlots();
 
         for (let i = 0; i < fileList.length; i++) {
 
             const file = fileList[i],
                 currentFile = this.newFile(file),
-                fileMeta = Uploader.getFileReady(currentFile.file),
-                addEmpty = openSlots <= 0;
+                fileMeta = Uploader.getFileReady(currentFile.file);
 
             let fileId = Uploader.itemId(fileMeta.name);
 
@@ -179,11 +196,13 @@ class Uploader {
             fileMeta.id = fileId;
             this.fileCounter++;
 
-            if (!addEmpty) {
+            if (this.maxSizeExceeded(fileMeta.size)) {
+                fileMeta.error = this.maxFileSizeText;
+            } else if (openSlots <= 0) {
+                fileMeta.error = this.maxFilesText;
+            } else {
                 openSlots--;
                 fileIds.push(fileId);
-            } else {
-                fileMeta.error = this.maxFilesText;
             }
 
             this.uploads[fileId] = currentFile;
