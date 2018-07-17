@@ -13,7 +13,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Set NPM user
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          command: echo -e $NPMRC > ~/.npmrc
       - run:
           name: Install dependencies
           command: npm i
@@ -21,16 +21,12 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - save_cache:
-          key: build-cache-{{ .Revision }}
-          paths:
-            - ../app
   test:
     <<: *defaults
     steps:
       - checkout
       - restore_cache:
-          key: build-cache-{{ .Revision }}
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Test
           command: npm t
@@ -39,10 +35,10 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: build-cache-{{ .Revision }}
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Set NPM user
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          command: echo -e $NPMRC > ~/.npmrc
       - run:
           name: Publish to NPM
           command: npx ndsh publish
@@ -51,11 +47,13 @@ workflows:
   version: 2
   ci-cd:
     jobs:
-      - install
+      - install:
+          context: org-global
       - test:
           requires:
             - install
       - publish:
+          context: org-global
           requires:
             - test
 
