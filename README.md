@@ -3,7 +3,7 @@ Uploader package for client side usage, handles interaction with the server, and
 
 Usage:
 ```
-import UploadController from '@fiverr/uploader';
+import UploadController from '@fiverr-private/uploader';
 
 const uploader = new UploadController({
     url: `${location.protocol}//${location.host}/message_attachments`, // your attachments route
