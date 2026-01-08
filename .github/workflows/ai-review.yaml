@@ -1,0 +1,13 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+jobs:
+  ai-review:
+    uses: fiverr/github_workflows/.github/workflows/ai_pr_review.yaml@master
+    with:
+      repo_name: fiverr/github_workflows
+      workflows_branch: master
+    secrets: inherit
